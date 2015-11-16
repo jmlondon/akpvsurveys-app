@@ -26,7 +26,8 @@ ui <- fluidPage(
     ),
   # Application title
   title = "Alaska Harbor Seal Abundance Explorer",
-  leafletOutput("mymap",height=350),
+  p(),
+  leafletOutput("mymap",height=450),
   h2("Alaska Harbor Seal Abundance Explorer"),
   fluidRow(
     tabsetPanel(
@@ -102,7 +103,10 @@ ui <- fluidPage(
                       tags$a(href="https://inport.nmfs.noaa.gov/inport/item/17349",
                              "Aerial Survey Units for Harbor Seals in Coastal Alaska")
                     )
-                  )),p(),
+                  )),p(),p(tags$small(
+                    a(href="https://github.com/jmlondon/akpvsurveys-app",
+                      "complete source code available on GitHub")
+                  )),
                   tags$strong('Contact Information'),tags$br(),
                   tags$small('Any questions regarding this application should be sent via email to josh.london@noaa.gov')
            ))
@@ -199,7 +203,7 @@ server <- function(input, output, session) {
     else {dat <- NULL}
     
     leafletProxy("mymap") %>% 
-        clearShapes()  %>% clearMarkers() %>% 
+        clearShapes()  %>% clearMarkers() %>% clearMarkerClusters() %>% 
         addCircles(layerId="poi_radius",
                    poi$lng,poi$lat,radius=input$buffer*1000,
                    color="black",fillOpacity = 0,weight=1,
@@ -208,8 +212,10 @@ server <- function(input, output, session) {
                     weight=2.5,color="#e31c3d",fillOpacity=0.3,
                     fillColor = "#f9dede",popup=~polyid,
                     group="Survey Units") %>% 
-      addCircleMarkers(data=dat$wypts,layerId=~name,stroke=FALSE,
-                 radius=3,color="#112e51",fillOpacity = 1,weight=2,
+      addCircleMarkers(data=dat$wypts,layerId=~name,
+                 radius=6,color="#e7f4e4",fillColor = "#2e8540",
+                 fillOpacity = 1,weight=2,
+                 clusterOptions = markerClusterOptions(showCoverageOnHover = FALSE),
                  group="Haul-out Wypts") %>% 
       addCircleMarkers(layerId = "poi_marker",
                        poi$lng,poi$lat,radius=10,
@@ -259,13 +265,15 @@ server <- function(input, output, session) {
   
   output$akpv_poly_table <- renderDataTable({
     data.frame(poly_data()) %>% 
-      select(polyid,stockname,abulast,abulastvar) %>%  
+      mutate(abulastse = sqrt(abulastvar)) %>% 
+      select(polyid,stockname,abulast,abulastse) %>%  
+      filter(!is.na(abulast)) %>% 
     datatable(colnames=c('Survey Unit ID' = 'polyid',
                          'Stock Name' = 'stockname',
                          '2011 Abundance Est.' = 'abulast',
-                         'Variance Est.' = 'abulastvar'),
+                         'SE Est.' = 'abulastse'),
               rownames=FALSE) %>% 
-      formatRound(c('2011 Abundance Est.','Variance Est.'),2)
+      formatRound(c('2011 Abundance Est.','SE Est.'),2)
   }, options = list(orderClasses = TRUE))
 
 }
