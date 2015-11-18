@@ -89,7 +89,7 @@ ui <- fluidPage(
                   tags$small('This application is intended for use by scientists and staff at the Alaska Fisheries Science Center, Alaska Regional Office, the Alaska stage agencies, the National Marine Fisheries Service, and other federal agencies.'),p(),
                   tags$strong('Prototype Application; NOT Official Communication'),tags$br(),
                   tags$small('This application should not be cited nor should the information be used without consultation. While the best efforts have been made to insure the highest quality, tools such as this are under constant development and are subject to change.'),br(),tags$small('This application is a Fundamental Research Communication developed and maintained by scientists at the NOAA Fisheries Alaska Fisheries Science Center and should not be construed as official communication of NMFS, NOAA, or the U.S. Dept. of Commerce.'),p(),
-                  tags$strong('Metadata and Data Sources'),br(),
+                  tags$strong('Metadata and Source Code'),br(),
                   tags$small('Data sources with links to the NMFS InPort metadata repository are provided below.',
                   tags$ul(
                     tags$li(
